@@ -1,0 +1,42 @@
+#input {
+	display: table;
+	padding: 16px;
+	margin: auto;
+	width: 75%;
+	min-width: 512px;
+}
+
+#input textarea {
+	width: 87.5%;
+	height: 8ch;
+	font-size: large;
+}
+
+.tableRow {
+	display: table-row;
+	margin: auto;
+}
+
+.tableRow p {
+	display: table-cell;
+	vertical-align: top;
+	padding: 8px;
+}
+
+.tableRow p:first-child {
+	text-align: right;
+	width: 12.5%;
+}
+
+button {
+	margin: 0px 8px 0px 0px;
+	background: white;
+	border: thin solid grey;
+	padding: 8px 16px;
+	font-size: large;
+}
+
+button:hover {
+	cursor: pointer;
+	background: #f7f7f7;
+}
