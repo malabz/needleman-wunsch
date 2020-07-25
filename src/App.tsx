@@ -11,7 +11,8 @@ class App extends Component<any, IAppState> {
     super(props);
     this.state = {
       lhs: "",
-      rhs: ""
+      rhs: "",
+      scores: []
     }
   }
 
@@ -33,15 +34,16 @@ class App extends Component<any, IAppState> {
           </a>
         </header> */}
         <Input onSubmitHandler={ this._submit.bind(this) } />
-        <NeedlemanWunsch lhs={ this.state.lhs } rhs={ this.state.rhs } />
+        <NeedlemanWunsch lhs={ this.state.lhs } rhs={ this.state.rhs } scores={ this.state.scores } />
       </div>
     );
   }
     
-  _submit(lhs: string, rhs: string) {
+  _submit(lhs: string, rhs: string, scores: number[]) {
     this.setState({
       lhs: lhs,
-      rhs: rhs
+      rhs: rhs,
+      scores: scores
     })
   }
 
@@ -50,6 +52,7 @@ class App extends Component<any, IAppState> {
 interface IAppState {
   lhs: string;
   rhs: string;
+  scores: number[];
 }
 
 export default App;

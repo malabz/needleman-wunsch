@@ -42,11 +42,11 @@ class NeedlemanWunsch extends Component<INeedlemanWunschProps, INeedlemanWunschS
         this.state = {
             lhs: props.lhs,
             rhs: props.rhs,
-            match: props.match || 7,
-            mismatch: props.mismatch || -3,
-            midopen: props.midopen || -13,
-            extension: props.extension || -2,
-            endopen: props.endopen || -3,
+            match: props.scores[0],
+            mismatch: props.scores[1],
+            midopen: props.scores[2],
+            extension: props.scores[3],
+            endopen: props.scores[4]
         }
 
         this.mtrx = this._matrixesInit();
@@ -108,16 +108,18 @@ class NeedlemanWunsch extends Component<INeedlemanWunschProps, INeedlemanWunschS
         let arr = [0, 0, 0];
         for (let i = 1; i <= this.state.lhs.length; ++i) {
             for (let j = 1; j <= this.state.rhs.length; ++j) {
+                const open: number = i === this.state.lhs.length || j === this.state.rhs.length ? this.state.endopen : this.state.midopen;
+
                 arr[NeedlemanWunsch.x] = this.mtrx[i - 1][j][NeedlemanWunsch.x];
-                arr[NeedlemanWunsch.y] = this.mtrx[i - 1][j][NeedlemanWunsch.y] + this.state.midopen;
-                arr[NeedlemanWunsch.z] = this.mtrx[i - 1][j][NeedlemanWunsch.z] + this.state.midopen;
+                arr[NeedlemanWunsch.y] = this.mtrx[i - 1][j][NeedlemanWunsch.y] + open;
+                arr[NeedlemanWunsch.z] = this.mtrx[i - 1][j][NeedlemanWunsch.z] + open;
                 indexOfMax = this._indexOfMax(arr);
                 this.mtrx[i][j][NeedlemanWunsch.x] = arr[indexOfMax] + this.state.extension;
                 this.path[i][j][NeedlemanWunsch.x] = indexOfMax;
 
-                arr[NeedlemanWunsch.x] = this.mtrx[i][j - 1][NeedlemanWunsch.x] + this.state.midopen;
+                arr[NeedlemanWunsch.x] = this.mtrx[i][j - 1][NeedlemanWunsch.x] + open;
                 arr[NeedlemanWunsch.y] = this.mtrx[i][j - 1][NeedlemanWunsch.y];
-                arr[NeedlemanWunsch.z] = this.mtrx[i][j - 1][NeedlemanWunsch.z] + this.state.midopen;
+                arr[NeedlemanWunsch.z] = this.mtrx[i][j - 1][NeedlemanWunsch.z] + open;
                 indexOfMax = this._indexOfMax(arr);
                 this.mtrx[i][j][NeedlemanWunsch.y] = arr[indexOfMax] + this.state.extension;
                 this.path[i][j][NeedlemanWunsch.y] = indexOfMax;
@@ -188,11 +190,11 @@ class NeedlemanWunsch extends Component<INeedlemanWunschProps, INeedlemanWunschS
         return {
             lhs: props.lhs,
             rhs: props.rhs,
-            match: props.match || 7,
-            mismatch: props.mismatch || -3,
-            midopen: props.midopen || -13,
-            extension: props.extension || -2,
-            endopen: props.endopen || -3
+            match: props.scores[0],
+            mismatch: props.scores[1],
+            midopen: props.scores[2],
+            extension: props.scores[3],
+            endopen: props.scores[4]
         }
     }
 
@@ -299,13 +301,6 @@ class NeedlemanWunsch extends Component<INeedlemanWunschProps, INeedlemanWunschS
         if (j > 0) this._setHighlighted(this._getColumnHeadElementById(j));
     }
 
-    _getMatchInfo(i: number, j: number, k: number): string {
-        if (k === NeedlemanWunsch.z)
-            return this.state.lhs.charAt(i) === this.state.rhs.charAt(j) ? "match " + this.state.match : "mismatch " + this.state.mismatch;
-        else
-            return k === this.path[i][j][k] ? "extension " + this.state.extension : "opengap " + (this.state.midopen + this.state.extension);
-    }
-    
     _handleMatrixElementMouseLeave(i: number, j: number): void {
         // console.log(i + " " + j);
         if (i > 0) this._unsetHighlighted(this._getRowHeadElementById(i))
@@ -314,17 +309,49 @@ class NeedlemanWunsch extends Component<INeedlemanWunschProps, INeedlemanWunschS
 
     _handleInnerMatrixElementMouseEnter(i: number, j: number, k: number, event: React.MouseEvent<HTMLTableDataCellElement, MouseEvent>): void {
         // console.log(i + " " + j + " " + k);
-        if (i > 0 && j > 0) this._setHighlighted(this._getInnerMatrixOrigin(i, j, k));
-        if (i > 0 && j > 0) {
+
+        const setTip = (tipContent: string) : void => {
             let tip = document.getElementById("tip") as HTMLDivElement;
-            (tip.firstChild as HTMLParagraphElement).innerHTML = this._getMatchInfo(i, j, k);
+            (tip.firstChild as HTMLParagraphElement).innerHTML = tipContent;
             tip.className = event.clientX > document.body.clientWidth / 2 ? "tip-left" : "tip-right";
+        }
+
+        if (i > 0 && j > 0) {
+            this._setHighlighted(this._getInnerMatrixOrigin(i, j, k));
+            setTip(this._getMatchInfo(i, j, k));
+        }
+
+        if (i === 0 && j > 0 && k === 1) {
+            this._setHighlighted(this._getInnerMatrixElementById(i, j - 1, k));
+            setTip("extension " + this.state.extension);
+        }
+
+        if (i > 0 && j === 0 && k === 0) {
+            this._setHighlighted(this._getInnerMatrixElementById(i - 1, j, k));
+            setTip("extension " + this.state.extension);
+        }
+
+        if (i === 0 && j === 0)
+        {
+            if (k === 1) setTip("endopen " + this.state.endopen);
+            if (k === 2) setTip("beginning " + 0);
         }
     }
 
+    _getMatchInfo(i: number, j: number, k: number): string {
+        if (k === NeedlemanWunsch.z)
+            return this.state.lhs.charAt(i - 1) === this.state.rhs.charAt(j - 1) ? "match " + this.state.match : "mismatch " + this.state.mismatch;
+
+        return k === this.path[i][j][k] ? "extension " + this.state.extension : 
+                i === this.state.lhs.length || j === this.state.rhs.length ? "endopen " + (this.state.endopen + this.state.extension) :
+                        "opengap " + (this.state.midopen + this.state.extension);
+    }
+    
     _handleInnerMatrixElementMouseLeave(i: number, j: number, k: number): void {
         // console.log(i + " " + j + " " + k);
         if (i > 0 && j > 0) this._unsetHighlighted(this._getInnerMatrixOrigin(i, j, k));
+        if (i === 0 && j > 0 && k === 1) this._unsetHighlighted(this._getInnerMatrixElementById(i, j - 1, k));
+        if (i > 0 && j === 0 && k === 0) this._unsetHighlighted(this._getInnerMatrixElementById(i - 1, j, k));
         (document.getElementById("tip") as HTMLDivElement).className = "tip-none";
     }
 
@@ -377,11 +404,7 @@ export default NeedlemanWunsch;
 interface INeedlemanWunschProps {
     lhs: string;
     rhs: string;
-    match?: number;
-    mismatch?: number;
-    midopen?: number;
-    extension?: number;
-    endopen?: number;
+    scores: number[];
 }
 
 interface INeedlemanWunschState {

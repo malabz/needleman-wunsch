@@ -1,14 +1,32 @@
-#input {
-	display: table;
-	padding: 16px;
-	margin: auto;
+#inputMain {
 	width: 75%;
+	margin: auto;
 	min-width: 512px;
 }
 
-#input textarea {
-	width: 87.5%;
-	height: 8ch;
+#inputArea {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+}
+
+#inputButton {
+	text-align: center;
+}
+
+.inputTable {
+	display: table;
+	margin: 32px 32px 0px 32px;
+}
+
+#inputArea textarea {
+	height: 10ch;
+	width: 100%;
+	font-size: large;
+}
+
+#incputArea input {
+	width: 100%;
 	font-size: large;
 }
 
@@ -24,19 +42,29 @@
 }
 
 .tableRow p:first-child {
+	white-space: nowrap;
 	text-align: right;
-	width: 12.5%;
+	width: 25%;
 }
 
 button {
+	width: 8ch;
 	margin: 0px 8px 0px 0px;
 	background: white;
 	border: thin solid grey;
 	padding: 8px 16px;
-	font-size: large;
+	font-size: larger;
 }
 
 button:hover {
 	cursor: pointer;
 	background: #f7f7f7;
+}
+
+#sequence {
+	flex-grow: 3;
+}
+
+#score {
+	flex-grow: 1;
 }

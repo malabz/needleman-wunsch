@@ -1,27 +1,26 @@
 footer {
     color: #dcdcdc;
     text-align: center;
-    flex: 0 0 auto;
 }
 
-a {
+footer a {
     color: #dcdcdc !important;
 }
 
-a:link {
+footer a:link {
     text-decoration: none;
 }
 
-a:visited {
+footer a:visited {
     text-decoration: none;
     /* color: #dcdcdc; */
 }
 
-a:hover {
+footer a:hover {
     text-decoration: underline;
 }
 
-a:focus
+footer a:focus
 {
     outline: #dcdcdc dashed;
     /* border: #DCDCDC  dotted; */
